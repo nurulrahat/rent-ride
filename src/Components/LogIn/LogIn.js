@@ -1,9 +1,11 @@
 import { useContext, useState } from 'react';
 import { UserContext } from '../../App';
 import { useHistory, useLocation } from 'react-router';
-import { googleSignIn, googleSignOut,initializeLoginFramework, createUserWithEmailAndPassword, signInWithEmailAndPassword } from './ManageLogin';
+import { googleSignIn, googleSignOut, initializeLoginFramework, createUserWithEmailAndPassword, signInWithEmailAndPassword } from './ManageLogin';
 import './logIn.css'
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 // if (!firebase.apps.length) {
 //     firebase.initializeApp(firebaseConfig);
 //   } else {
@@ -12,11 +14,11 @@ import { Link } from 'react-router-dom';
 initializeLoginFramework();
 
 function LogIn() {
-    const [loggedInUser,setLoggedInUser]=useContext(UserContext);
-    let history = useHistory();
+  const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+  let history = useHistory();
   let location = useLocation();
   let { from } = location.state || { from: { pathname: "/" } };
-    const [user, setUser] = useState({
+  const [user, setUser] = useState({
     isSignedIn: false,
     name: '',
     email: '',
@@ -27,37 +29,37 @@ function LogIn() {
   });
   const [newUser, setNewUser] = useState(false);
 
-  const handleGoogleSignIn=()=> {
+  const handleGoogleSignIn = () => {
     googleSignIn()
-    .then(res=>{
-      setUser(res)
-      setLoggedInUser(res);
-      history.replace(from);
-    })
+      .then(res => {
+        setUser(res)
+        setLoggedInUser(res);
+        history.replace(from);
+      })
   }
-  const handleGoogleSignOut=()=> {
+  const handleGoogleSignOut = () => {
     googleSignOut()
-    .then(res=>{
-      setUser(res)
-      setLoggedInUser(res);
-    })
+      .then(res => {
+        setUser(res)
+        setLoggedInUser(res);
+      })
 
   }
-//  const handleSignInFb=()=> {
-//    signInFb()
-//    .then(res=>{
-//     setUser(res)
-//     setLoggedInUser(res);
-//   })
-//  }
+  //  const handleSignInFb=()=> {
+  //    signInFb()
+  //    .then(res=>{
+  //     setUser(res)
+  //     setLoggedInUser(res);
+  //   })
+  //  }
 
- 
+
   //handle fb sign in
-  
+
   //validation section
   const handleOnchange = (event) => {
     const test = event.target.value;
-    console.log(test,event.target.value)
+    console.log(test, event.target.value)
     let isFormValid = true;
     if (event.target.name === 'email') {
       isFormValid = /\S+@\S+\.\S+/.test(event.target.value)
@@ -79,69 +81,69 @@ function LogIn() {
     e.preventDefault();
     console.log(user.email, user.password)
     if (newUser && user.email && user.password) {
-     createUserWithEmailAndPassword(user.name, user.email, user.password)
-     .then(res =>{
-      setUser(res)
-      setLoggedInUser(res);
-      history.replace(from);
-     })
+      createUserWithEmailAndPassword(user.name, user.email, user.password)
+        .then(res => {
+          setUser(res)
+          setLoggedInUser(res);
+          history.replace(from);
+        })
     }
     if (!newUser && user.email && user.password) {
       signInWithEmailAndPassword(user.email, user.password)
-      .then(res=>{
-        console.log(res)
-      setUser(res)
-      setLoggedInUser(res);
-      history.replace(from);
-      })
-      
+        .then(res => {
+          console.log(res)
+          setUser(res)
+          setLoggedInUser(res);
+          history.replace(from);
+        })
+
     }
 
   }
-  
-  
+
+
   return (
     <div className="logInCls">
       <div>
-      <h3>Create Or LogIn your account</h3>
-      {/* <p>Name: {user.name}</p>
+        <h3>Create Or LogIn your account</h3>
+        {/* <p>Name: {user.name}</p>
       <p>Email: {user.email}</p>
       <p>Password: {user.password}</p> */}
-      <form action="" onSubmit={handleSubmit}>
-       {
-         newUser?<h2>Create You Account</h2>: <h2>Log In</h2>
-       }
+        <form action="" onSubmit={handleSubmit}>
+          {
+            newUser ? <h2>Create You Account</h2> : <h2>Log In</h2>
+          }
+          {
+            newUser && <input type="text" name="name" id="" onBlur={handleOnchange} placeholder="Type Name" />
+          }
+          <br />
+          <input type="text" name="email" id="" required onBlur={handleOnchange} placeholder="Type Email" />
+          <br />
+          <input type="password" name="password" id="" required onBlur={handleOnchange} placeholder="Type Password" />
+          <br />
+          <input type="submit" value={newUser ? 'Sign Up' : 'Sign In'} />
+          {
+            <Link onClick={() => setNewUser(!newUser)}> {newUser ? <p>Log In</p> : <p>Create New Account</p>} </Link>
+          }
+        </form>
         {
-          newUser && <input type="text" name="name" id="" onBlur={handleOnchange} placeholder="Type Name" />
+          user.isSignedIn ? <button onClick={handleGoogleSignOut}>Sign Out</button> : <button type="button" className="btn btn-primary btn-lg" onClick={handleGoogleSignIn}><FontAwesomeIcon icon={faGoogle}></FontAwesomeIcon> SignIn with Google</button>
+
         }
         <br />
-        <input type="text" name="email" id="" required onBlur={handleOnchange} placeholder="Type Email" />
-        <br />
-        <input type="password" name="password" id="" required onBlur={handleOnchange} placeholder="Type Password" />
-        <br />
-        <input type="submit" value={newUser ? 'Sign Up' : 'Sign In'} />
-        {
-        <Link  onClick={() => setNewUser(!newUser)}> {newUser? <p>Log In</p> :<p>Create New Account</p>} </Link>
-       } 
-      </form>
-      {
-        user.isSignedIn ? <button onClick={handleGoogleSignOut}>Sign Out</button> : <button type="button" className="btn btn-primary btn-lg" onClick={handleGoogleSignIn}>SignIn with Google</button>
-
-      }
-      <br />
-      {/* <button type="button" className="btn btn-primary btn-lg mt-3" onClick={handleSignInFb}>SignIn with FB</button> */}
-      {/* {
+        {/* <button type="button" className="btn btn-primary btn-lg mt-3" onClick={handleSignInFb}>SignIn with FB</button> */}
+        {/* {
         user.isSignedIn && <div>
           <p>Welcome!  {user.name}</p>
           <p>Your email: {user.email}</p>
           <img src={user.photo} alt="" />
         </div>
       } */}
-      {
-        user.success ? <p style={{ color: "green" }}>Your  have been {newUser ? 'Created your account' : 'signed in'} successfully </p> : <p style={{ color: "red" }}>{user.error}</p>
-      }
+        {
+          user.success ? <p style={{ color: "green" }}>Your  have been {newUser ? 'Created your account' : 'signed in'} successfully </p> : <p style={{ color: "red" }}>{user.error}</p>
+        }
 
-    </div>
+      </div>
     </div>
   );
 }
